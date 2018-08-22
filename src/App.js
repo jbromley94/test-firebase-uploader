@@ -8,11 +8,12 @@ firebase.initializeApp(config);
 
 class ProfilePage extends Component {
   state = {
-    username: "",
+    username: "jbromley94",
     avatar: "",
     isUploading: false,
     progress: 0,
-    avatarURL: ""
+    avatarURL: "",
+    geopoint: [-2.233102, 53.477375]
   };
 
   handleChangeUsername = event =>
@@ -27,10 +28,16 @@ class ProfilePage extends Component {
     this.setState({ avatar: filename, progress: 100, isUploading: false });
     firebase
       .storage()
-      .ref("images")
+      .ref(this.state.username)
       .child(filename)
       .getDownloadURL()
-      .then(url => this.setState({ avatarURL: url }));
+      .then(url => {
+        console.log(url)
+        this.setState({ avatarURL: url });
+    
+    })
+
+      
   };
 
   render() {
@@ -50,13 +57,20 @@ class ProfilePage extends Component {
           <FileUploader
             accept="image/*"
             name="avatar"
-            filename={file => this.state.username + file.name.split(".")[1]}
+            filename={file =>
+              "~" +
+              this.state.geopoint +
+              "~" +
+              this.state.username +
+              file.name.split(".")[1]
+            }
             storageRef={firebase.storage().ref(this.state.username)}
             onUploadStart={this.handleUploadStart}
             onUploadError={this.handleUploadError}
             onUploadSuccess={this.handleUploadSuccess}
             onProgress={this.handleProgress}
           />
+          
           <CustomUploadButton
             accept="image/*"
             storageRef={firebase.storage().ref(this.state.username)}
